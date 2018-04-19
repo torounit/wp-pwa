@@ -6,12 +6,13 @@ class Assets_Seeker {
 	private $styles = [];
 	private $scripts = [];
 
+
 	public function __construct() {
 		add_action( 'wp_head', [ $this, 'ob_start' ], 0 );
 		add_action( 'wp_footer', [ $this, 'ob_start' ], 0 );
 		add_action( 'wp_head', [ $this, 'ob_end_and_parse' ], 9999 );
 		add_action( 'wp_footer', [ $this, 'ob_end_and_parse' ], 9999 );
-		add_action( 'shutdown', [ $this, 'save_paths'] );
+		add_action( 'shutdown', [ $this, 'save_paths' ] );
 	}
 
 	public function ob_start() {
@@ -32,10 +33,10 @@ class Assets_Seeker {
 		$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 		$xpath = new DOMXPath( $dom );
 
-		$styles = $this->query( $xpath, '//link[@rel="stylesheet"]', 'href' );
+		$styles       = $this->query( $xpath, '//link[@rel="stylesheet"]', 'href' );
 		$this->styles = array_merge( $this->styles, $styles );
 
-		$scripts = $this->query( $xpath, '//script', 'src' );
+		$scripts       = $this->query( $xpath, '//script', 'src' );
 		$this->scripts = array_merge( $this->scripts, $scripts );
 
 	}
@@ -48,8 +49,8 @@ class Assets_Seeker {
 	 * @return array
 	 */
 	public function query( DOMXPath $xpath, $expression, $attribute ) {
-		$query         = iterator_to_array( $xpath->query( $expression ) );
-		$values       = array_filter( array_map( function ( DOMElement $node ) use ( $attribute ) {
+		$query  = iterator_to_array( $xpath->query( $expression ) );
+		$values = array_filter( array_map( function ( DOMElement $node ) use ( $attribute ) {
 			return $node->getAttribute( $attribute );
 		}, $query ) );
 
@@ -57,7 +58,6 @@ class Assets_Seeker {
 	}
 
 	public function save_paths() {
-
 		update_option( 'pwa_style_paths', $this->styles );
 		update_option( 'pwa_script_paths', $this->scripts );
 	}

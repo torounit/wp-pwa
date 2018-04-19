@@ -1,11 +1,10 @@
 'use strict';
-
-const PRE_CACHE_NAME = 'pre-cache-v1';
-const RUNTIME_CACHE_NAME = 'runtime-cache-v1';
+const APP_SHELL_CACHE_NAME = "app-shell-cache-<?php echo get_option( 'pwd_last_updated' )?>";
+const RUNTIME_CACHE_NAME = 'runtime-cache-<?php echo get_option( 'pwd_last_updated' );?>';
+const  NOT_AVAILABLE_KEY = '/<?php echo NOT_AVAILABLE_ENDPOINT;?>/';
 
 const urlsToPreCache = [
-	'/',
-	'/not-available/',
+	NOT_AVAILABLE_KEY,
 	<?php foreach ( get_option( 'pwa_style_paths' ) as $css ): ?>
 	'<?php echo esc_url( $css );?>',
 	<?php endforeach; ?>
@@ -18,7 +17,7 @@ const urlsToPreCache = [
 self.addEventListener( 'install', ( event ) => {
 	console.log( '[ServiceWorker] Install' );
 	event.waitUntil(
-		caches.open( PRE_CACHE_NAME )
+		caches.open( APP_SHELL_CACHE_NAME )
 			.then( ( cache ) => {
 				console.log( '[ServiceWorker] Caching app' );
 				return cache.addAll( urlsToPreCache );
@@ -28,13 +27,13 @@ self.addEventListener( 'install', ( event ) => {
 
 self.addEventListener( 'activate', ( event ) => {
 	console.log( '[ServiceWorker] Activate' );
-	const cacheWhitelist = [ PRE_CACHE_NAME ];
+	const cacheWhitelist = [ APP_SHELL_CACHE_NAME ];
 	event.waitUntil(
 		caches.keys().then( ( cacheNames ) => {
 			return Promise.all(
 				cacheNames.map( ( cacheName ) => {
-					console.log( '[ServiceWorker] Removing old cache', cacheName );
 					if (cacheWhitelist.indexOf( cacheName ) === - 1) {
+						console.log( '[ServiceWorker] Removing old cache', cacheName );
 						return caches.delete( cacheName );
 					}
 				} )
@@ -45,7 +44,6 @@ self.addEventListener( 'activate', ( event ) => {
 
 
 self.addEventListener( 'fetch', ( event ) => {
-	console.log( event.request );
 	if (
 		event.request.url.indexOf( 'wp-admin' ) === - 1 &&
 		event.request.url.indexOf( 'wp-login' ) === - 1 &&
@@ -63,7 +61,6 @@ self.addEventListener( 'fetch', ( event ) => {
 				}
 
 				let promise = fetch( event.request ).then( ( response ) => {
-					console.log( event.request );
 					if (! response || response.status !== 200 || response.type !== 'basic') {
 						return response;
 					}
@@ -83,7 +80,7 @@ self.addEventListener( 'fetch', ( event ) => {
 				else {
 					if (event.request.mode === 'navigate') {
 						// Follback.
-						return caches.match( '/not-available/' ).then( ( response ) => {
+						return caches.match( NOT_AVAILABLE_KEY ).then( ( response ) => {
 							return response;
 						} );
 					}
