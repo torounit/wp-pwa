@@ -1,0 +1,1 @@
+navigator.serviceWorker.register( '/service-worker/', { scope: '/' } );

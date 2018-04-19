@@ -1,0 +1,24 @@
+version: "2"
+services:
+    wordpress:
+        image: wordpress:latest
+        ports:
+            - "9000:80"
+        depends_on:
+            - db
+        environment:
+            WORDPRESS_DB_HOST: "db:3306"
+        env_file: .env
+        volumes:
+            - ./wp-content/themes:/var/www/html/wp-content/themes
+            - ./wp-content/plugins:/var/www/html/wp-content/plugins
+            - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
+    db:
+        image: mysql:latest
+        env_file: .env
+        volumes:
+            - db-data:/var/lib/mysql
+
+volumes:
+    db-data:
+        driver: local
