@@ -19,7 +19,8 @@
         "wpackagist-theme/twentyseventeen": "^1.0",
         "wpackagist-plugin/wp-multibyte-patch": "^2.8.1",
         "wpackagist-plugin/wordpress-importer": "^0.6",
-        "wpackagist-plugin/query-monitor": "^3.0"
+        "wpackagist-plugin/query-monitor": "^3.0",
+        "wp-cli/wp-cli": "^1.5"
     },
     "config": {
         "process-timeout": 0
