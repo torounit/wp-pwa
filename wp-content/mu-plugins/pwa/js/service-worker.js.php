@@ -1,6 +1,6 @@
 'use strict';
 const APP_SHELL_CACHE_NAME = "app-shell-cache-<?php echo get_option( 'pwd_last_updated' )?>";
-const RUNTIME_CACHE_NAME = 'runtime-cache-<?php echo get_option( 'pwd_last_updated' );?>';
+const RUNTIME_CACHE_NAME = 'runtime-cache';
 const  NOT_AVAILABLE_KEY = '/<?php echo NOT_AVAILABLE_ENDPOINT;?>/';
 
 const urlsToPreCache = [
@@ -65,9 +65,17 @@ self.addEventListener( 'fetch', ( event ) => {
 						return response;
 					}
 					let responseToCache = response.clone();
+					let responseToMessage = response.clone();
 					caches.open( RUNTIME_CACHE_NAME ).then( ( cache ) => {
+						console.log(responseToMessage)
 						cache.put( event.request, responseToCache );
 						console.log( '[ServiceWorker] Fetched&Cached Data', event.request.url );
+						let message = {
+							key : 'updateContent',
+							value: event.request.url
+						};
+						self.clients.matchAll().then(clients =>
+							clients.forEach(client => client.postMessage(message)));
 					} );
 
 					return response;

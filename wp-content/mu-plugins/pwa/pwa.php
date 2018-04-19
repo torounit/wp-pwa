@@ -7,10 +7,13 @@ define( 'NOT_AVAILABLE_ENDPOINT', 'not-available' );
 define( 'UPDATE_CACHE_QUERY_VAR', 'update-asset-caches' );
 
 add_action( 'init', function () {
-
-	wp_enqueue_script( 'pwa-fetch-html', WPMU_PLUGIN_URL . '/pwa/fetch-html.js', [ 'jquery'], false, true );
 	add_rewrite_endpoint( 'service-worker', EP_ROOT );
 	add_rewrite_endpoint( NOT_AVAILABLE_ENDPOINT, EP_ROOT );
+} );
+
+add_action( 'wp_enqueue_scripts', function () {
+	wp_enqueue_script( 'pwa-fetch-html', WPMU_PLUGIN_URL . '/pwa/fetch-html.js', [ 'jquery'], false, true );
+
 } );
 
 add_filter( 'query_vars', function ( $vars ) {
