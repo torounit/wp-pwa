@@ -33,6 +33,14 @@
 
 
 	const selector = '#page';
+	const selectorForSEO = `
+					meta[property^="og"],
+					meta[property^="twitter"],
+					link[rel="canonical"],
+					link[rel="prev"],
+					link[rel="next"]
+					`;
+
 	document.addEventListener( "DOMContentLoaded", () => {
 		if ('caches' in window) {
 			console.log( '[fetch-html]', location.href );
@@ -44,27 +52,13 @@
 					return response.text()
 				} ).then( ( responseText ) => {
 					let html = parseHTML( responseText );
-					let content = html.querySelector( selector ).innerHTML;
-
-					document.querySelector( selector ).innerHTML = content;
+					document.querySelector( selector ).innerHTML = html.querySelector( selector ).innerHTML;
 					document.querySelector( 'title' ).innerText = html.querySelector( 'title' ).innerText;
-					let selectorForSEO = `
-					meta[property^="og"],
-					meta[property^="twitter"],
-					link[rel="canonical"],
-					link[rel="prev"],
-					link[rel="next"]
-					`;
-					document.querySelectorAll( selectorForSEO ).forEach( function( el ) {
-						el.remove();
-					} );
-
-					let head = document.querySelector( 'head' );
-
-					html.querySelectorAll( selectorForSEO ).forEach( function( el ) {
-						console.log( el );
-						head.appendChild( el );
-					} );
+					//replace meta and link tags.
+					let fragment = document.createDocumentFragment();
+					html.querySelectorAll( selectorForSEO ).forEach( el => fragment.appendChild( el ) );
+					document.querySelectorAll( selectorForSEO ).forEach( el => el.remove() );
+					document.querySelector( 'head' ).appendChild( fragment );
 
 				} ).finally( () => {
 				} )
