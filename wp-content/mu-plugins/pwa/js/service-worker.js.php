@@ -52,11 +52,11 @@ self.addEventListener( 'fetch', ( event ) => {
 		console.log( '[ServiceWorker] Fetch', event.request.url );
 		// for cache.
 		event.respondWith(
-			caches.match( event.request ).then( ( response ) => {
-				if (response) {
+			caches.match( event.request ).then( ( responseFromCache ) => {
+				if (responseFromCache) {
 					if ([ 'style', 'script', 'image' ].indexOf( event.request.destination ) > - 1) {
-						console.log( '[ServiceWorker] Cache Matched!', event.request.url, response );
-						return response;
+						console.log( '[ServiceWorker] Cache Matched!', event.request.url, responseFromCache );
+						return responseFromCache;
 					}
 				}
 
@@ -65,9 +65,7 @@ self.addEventListener( 'fetch', ( event ) => {
 						return response;
 					}
 					let responseToCache = response.clone();
-					let responseToMessage = response.clone();
 					caches.open( RUNTIME_CACHE_NAME ).then( ( cache ) => {
-						console.log(responseToMessage)
 						cache.put( event.request, responseToCache );
 						console.log( '[ServiceWorker] Fetched&Cached Data', event.request.url );
 						let message = {
@@ -81,9 +79,9 @@ self.addEventListener( 'fetch', ( event ) => {
 					return response;
 				} );
 
-				if (response) {
-					console.log( '[ServiceWorker] Cache Matched!', event.request.url, response );
-					return response;
+				if (responseFromCache) {
+					console.log( '[ServiceWorker] Cache Matched!', event.request.url, responseFromCache );
+					return responseFromCache;
 				}
 				else {
 					if (event.request.mode === 'navigate') {

@@ -39,6 +39,7 @@ add_action( 'template_redirect', function () {
 
 	if ( isset( $wp_query->query[ SERVICE_WORKER_ENDPOINT ] ) ) {
 		header( 'Content-Type: text/javascript' );
+		header( 'Cache-Control: max-age='. MINUTE_IN_SECONDS * 30 );
 		header( 'Service-Worker-Allowed: /' );
 		include dirname( __FILE__ ) . '/js/service-worker.js.php';
 		exit;
